@@ -1,0 +1,9 @@
+{
+    "members" : [
+
+        {"id":1,"projectId": 1, "email": "ana@gmail.com","role":  "Admin"},
+        {"id":2,"projectId": 2, "email": "carlos@gmail.com","role":  "Operator"},
+        {"id":3,"projectId": 3, "email": "bia@gmail.com","role":  "Viewer"}
+
+    ]
+}
