@@ -1,15 +1,15 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectorRef} from '@angular/core';
 import { Member, Role } from './member-model';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, FormControl, Validators } from '@angular/forms';
 import { MatFormFieldModule} from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
+import { MemberService } from './member.service';
 
-import { range } from 'rxjs';
-import { email } from '@angular/forms/signals';
+
 
 @Component({
   selector: 'app-member-manager',
@@ -25,6 +25,12 @@ import { email } from '@angular/forms/signals';
   styleUrl: './member-manager.css',
 })
 export class MemberManager {
+
+  constructor(
+    private memberService: MemberService,
+    private cdr: ChangeDetectorRef
+  
+  ) {}
 
  displayedColumns: string[] = [
     'id',
@@ -91,49 +97,68 @@ nextId = 4;
 role: Role = 'Viewer';
 editing: Member | null = null;
 
-filterMembers() {
+filterMembers() { 
+
+  
   if(!this.hasProject) {
     this.filtered = [];
     return;
   }
-  this.filtered = this.members.filter (m => m.projectId === this._projectId);
-}
+  this.memberService.getByProject(this._projectId!)
+  .subscribe(data => {
+    this.filtered=data;
+    this.cdr.markForCheck();
+
+  })};
+
 changeRole(m: Member, newRole: Role) {
-  m.role = newRole;
+
+  if(!['Admin','Operator','Viewer'].includes(newRole)) {
+    return;
+  }
+
+  const updated = {...m, role:newRole}
+  this.memberService.update(updated).subscribe(() => m.role= newRole);
 }
 
 addMembers() {
+  const projectId = this._projectId;
+  const email = this.email.trim();
 
-
-  if(!this.hasProject || !this.email.trim() ) {
+  if(projectId === null) {
     return;
   }
-  if(!this.email.includes('@')) {
-    alert('E-mail inválido.');
+  const emailControl = new FormControl(email, [Validators.required, Validators.email])
+  if(emailControl.invalid) {
+    alert('informe um e-mail válido.')
     return;
   }
+   this.memberService.add({ projectId, 
+    email, role: this.role}) 
+    .subscribe(newMember => { this.filtered = [...this.filtered, newMember];
+    this.email = '';
+    this.cdr.markForCheck();
+  });
+
   
-   const newMember = {
-
-    id: this.nextId++,
-    projectId: this._projectId!,
-    email: this.email.trim(),
-    role: this.role
-
-  };
-
-  this.members.push(newMember);
-  this.filterMembers();
-  this.email = '';
-  this.role = 'Viewer';
 }
   
 
 deleteMembers(id: number){
   if(!confirm(`Remover membro ${id}?`)) return;
   
-  this.members = this.members.filter(m => m.id !== id);
-  this.filterMembers();
+  
+  this.memberService.delete(id).subscribe(() => {
+    if (this.editing?.id === id) {
+      this.editing = null;
+      this.email = '';
+      this.role = 'Viewer';
+      this.cdr.markForCheck();
+    }
+    this.filterMembers();
+  });
+  
+
 }
 
 editMembers(m: Member) {
@@ -151,7 +176,7 @@ updateMembers(){
     alert('E-mail inválido.');
     return;
   }
- 
+  this.memberService.update
   this.editing.email = this.email.trim();
   this.editing.role = this.role;
   this.email = '';
@@ -162,4 +187,3 @@ updateMembers(){
 }
 
 }
-
