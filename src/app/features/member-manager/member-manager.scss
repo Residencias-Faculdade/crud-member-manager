@@ -1,0 +1,49 @@
+@use '@angular/material' as mat;
+:host {
+
+    display: block;
+    color-scheme: light;
+
+    @include mat.theme ((
+        color: (
+            primary: mat.$azure-palette,
+            tertiary: mat.$blue-palette,
+        ),
+        typography: Roboto,
+        density: 0
+    ));
+
+    background-color: var(--mat-sys-surface);
+    color: var(--mat-svs-on-surface);
+    font: var(--mat-style-body-medium)
+
+}
+
+
+
+
+.container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0px 24px;
+}
+.form {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 24px 0;
+}
+mat-form-field {
+    width: 280px;
+}
+.form button {
+    margin-bottom: 20px;
+}
+table {
+    width: 100%;
+    margin-top: 24px; 
+}
+.actions {
+    display: flex;
+    gap: 8px;
+}

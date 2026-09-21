@@ -1,4 +1,4 @@
-import { Component, Input, ChangeDetectorRef} from '@angular/core';
+import { Component, Input, ChangeDetectorRef, ViewEncapsulation} from '@angular/core';
 import { Member, Role } from './member-model';
 import { CommonModule } from '@angular/common';
 import { FormsModule, FormControl, Validators } from '@angular/forms';
@@ -9,7 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { MemberService } from './member.service';
 
-
+  
 
 @Component({
   selector: 'app-member-manager',
@@ -19,10 +19,11 @@ import { MemberService } from './member.service';
     MatFormFieldModule, 
     MatSelectModule, 
     MatInputModule, MatButtonModule,
-    MatTableModule
+    MatTableModule,
   ],
+  encapsulation: ViewEncapsulation.ShadowDom,
   templateUrl: './member-manager.html',
-  styleUrl: './member-manager.css',
+  styleUrl: './member-manager.scss',
 })
 export class MemberManager {
 
